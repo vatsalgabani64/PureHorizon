@@ -23,12 +23,12 @@ def local_css(file_name):
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 
-local_css("style/style.css")
+local_css("100_project/style/style.css")
 
 # ---- LOAD ASSETS ----
 lottie_coding = load_lottieurl("https://lottie.host/a96988fe-9d6f-448b-94c1-97b710cd53bf/Sg5SAAAUOw.json")
-img_contact_form = Image.open("image_01.jpg")
-img_lottie_animation = Image.open("image_01.jpg")
+img_contact_form = Image.open("100_project/image_01.jpg")
+img_lottie_animation = Image.open("100_project/image_01.jpg")
 
 # ---- HEADER SECTION ----
 st.subheader("Air Pollution Prediction & Visualization")
@@ -113,8 +113,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-df = pd.read_csv('predicted.csv')
-standards = pd.read_csv('standard.csv')
+df = pd.read_csv('100_project/predicted.csv')
+standards = pd.read_csv('100_project/standard.csv')
 
 def Home_screen():
     st.header("Air Quality Prediction")
@@ -140,7 +140,7 @@ def Analysis_screen():
 
 def Visualization_screen():
     
-    df=pd.read_csv('predicted.csv')
+    df=pd.read_csv('100_project/predicted.csv')
     # cities = {'City':['Ahmedabad','Gandhinagar']}
     # cities = df2['City'].unique()
     # selected_city = st.selectbox('Select city', cities)

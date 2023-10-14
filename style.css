@@ -4,6 +4,7 @@ input[type=message],
 input[type=email],
 input[type=text],
 textarea {
+    /* background-color: #FFCCFF; */
     width: 100%;
     /* Full width */
     padding: 12px;

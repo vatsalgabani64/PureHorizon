@@ -39,19 +39,21 @@ st.write("[More information about PureHorizon]()") # added link for more info of
 # ---- WHAT I DO ----
 with st.container():
     st.write("---")
-    left_column, right_column = st.columns(2)
+    left_column, right_column = st.columns([2,1])
     with left_column:
         st.header("What We do")
         st.write("##")
         st.write(
             """
-            - Data Analysis through Central Pollution Control Board: CPCB specified methods for AQI calculation
+            - Data Analysis through Central Pollution Control Board(CPCB) specified methods for AQI calculation
             - Air Quality Prediction throgh LSTM 
             - Data Visualization for pollutants and AQI index
             """
         )
         # st.write("[YouTube Channel >](https://youtube.com/c/CodingIsFun)")
     with right_column:
+        st.write('<style>div[data-widget="stLottie"] { background-color: lightblue; }</style>', unsafe_allow_html=True)
+        
         st_lottie(lottie_coding, height=300, key="coding")
 
 # ---- PROJECTS ----
@@ -91,8 +93,9 @@ with st.container():
 st.markdown(
     """
     <style>
-    # .full-width-plot {
-    #     width: 70%;
+    # *{
+    #     background-color: #FF99FF;
+    #     color: black;
     # }
     .st-eb {
         width: 50%;
@@ -104,6 +107,11 @@ st.markdown(
     th, td {
         width: 50%;
     }
+    div[data-widget="stOptionMenu"] .stOptionMenu {
+        color:white;
+        padding: 10px;
+        margin: 0;
+    }
     </style>
     """,
     unsafe_allow_html=True
@@ -114,8 +122,29 @@ standards = pd.read_csv('standard.csv')
 
 def Home_screen():
     st.header("Air Quality Prediction")
+    st.write(
+        """
+        The following properties have been worked upon:
+        - PM2.5
+        - PM10
+        - SO2
+        - CO
+        - Ozone 
+        - NO2
+        - AQI
+        """
+    )
 
 def Analysis_screen():
+    st.markdown("""
+        <style>
+            .multiselect label span {
+                color: red; /* Change the text color to red */
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
     st.title('Predicted Pollutant Levels')
     pollutants = st.multiselect('Select pollutants', ['PM2.5','PM10','SO2','CO','Ozone','NO2','AQI'])
     if pollutants:
@@ -123,16 +152,6 @@ def Analysis_screen():
         # st.write(df[pollutants])
         lst = [f'prediction_{x}' for x in pollutants]
         st.write(df[lst])
-    
-
-    # #df['Future_Date'] is now index of df ,inplace=true modifies df without creating new df
-    # df.set_index(df['Future_Date'],inplace=True)
-    # st.write(df)
-
-    # #displays label 'PM2.5' with given value
-    # # st.write('PM2.5', df['prediction_PM2.5 (ug/m3)'])
-    # #display first few rows
-    # st.write(df.head()) 
 
 def Visualization_screen():
     

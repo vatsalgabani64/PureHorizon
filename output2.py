@@ -31,8 +31,8 @@ img_contact_form = Image.open("image_01.jpg")
 img_lottie_animation = Image.open("image_01.jpg")
 
 # ---- HEADER SECTION ----
+st.title("PureHorizon")
 st.subheader("Air Pollution Prediction & Visualization")
-st.title("Python project")
 st.write("PureHorizon is a platform that uses machine learning to predict air quality and visualize pollution data. It can be used to track air quality in real time, identify pollution hotspots, and forecast air quality conditions. PureHorizon is a valuable tool for businesses, governments, and individuals who need to make informed decisions about air quality.")
 st.write("[More information about PureHorizon]()") # added link for more info of our project
 
@@ -41,17 +41,13 @@ with st.container():
     st.write("---")
     left_column, right_column = st.columns(2)
     with left_column:
-        st.header("What I do")
+        st.header("What We do")
         st.write("##")
         st.write(
             """
-            On my YouTube channel I am creating tutorials for people who:
-            - are looking for a way to leverage the power of Python in their day-to-day work.
-            - are struggling with repetitive tasks in Excel and are looking for a way to use Python and VBA.
-            - want to learn Data Analysis & Data Science to perform meaningful and impactful analyses.
-            - are working with Excel and found themselves thinking - "there has to be a better way."
-
-            If this sounds interesting to you, consider subscribing and turning on the notifications, so you don’t miss any content.
+            - Data Analysis through Central Pollution Control Board: CPCB specified methods for AQI calculation
+            - Air Quality Prediction throgh LSTM 
+            - Data Visualization for pollutants and AQI index
             """
         )
         # st.write("[YouTube Channel >](https://youtube.com/c/CodingIsFun)")

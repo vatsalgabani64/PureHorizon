@@ -231,23 +231,85 @@ if selected == "Visualization":
     Visualization_screen()
 
 # ---- CONTACT ----
-with st.container():
-    st.write("---")
-    st.header("Get In Touch With Me!")
-    st.write("##")
+# with st.container():
+#     st.write("---")
+#     st.header("Get In Touch With Me!")
+#     st.write("##")
 
-    # Documention: https://formsubmit.co/ !!! CHANGE EMAIL ADDRESS !!!
-    contact_form = """
-    <form action="https://formsubmit.co/YOUR@MAIL.COM" method="POST">
-        <input type="hidden" name="_captcha" value="false">
-        <input type="text" name="name" placeholder="Your name" required>
-        <input type="email" name="email" placeholder="Your email" required>
-        <textarea name="message" placeholder="Your message here" required></textarea>
-        <button type="submit">Send</button>
-    </form>
-    """
-    left_column, right_column = st.columns(2)
-    with left_column:
-        st.markdown(contact_form, unsafe_allow_html=True)
-    with right_column:
-        st.empty()
+#     # Documention: https://formsubmit.co/ !!! CHANGE EMAIL ADDRESS !!!
+#     contact_form = """
+#     <form action="https://formsubmit.co/YOUR@MAIL.COM" method="POST">
+#         <input type="hidden" name="_captcha" value="false">
+#         <input type="text" name="name" placeholder="Your name" required>
+#         <input type="email" name="email" placeholder="Your email" required>
+#         <textarea name="message" placeholder="Your message here" required></textarea>
+#         <button type="submit">Send</button>
+#     </form>
+#     """
+#     left_column, right_column = st.columns(2)
+#     with left_column:
+#         st.markdown(contact_form, unsafe_allow_html=True)
+#     with right_column:
+#         st.empty()
+
+import sqlite3
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+
+# Database Connection
+conn = sqlite3.connect('form_data.db')
+cursor = conn.cursor()
+
+# Create a table to store form data
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS contact_data (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        email TEXT,
+        message TEXT
+    )
+''')
+
+# Streamlit app
+st.title("Contact Form")
+with st.form("Contact Form"):
+    # Get data from the form
+    name = st.text_input("Your name")
+    email = st.text_input("Your email")
+    message = st.text_area("Your message")
+
+    if st.form_submit_button("Send"):
+        # Insert data into the database
+        cursor.execute("INSERT INTO contact_data (name, email, message) VALUES (?, ?, ?)", (name, email, message))
+        conn.commit()
+
+        # Send an email
+        smtp_server = 'smtp.gmail.com'
+        smtp_port = 587
+        smtp_username = 'gabanivatsal17@gmail.com'
+        smtp_password = 'rpob ahoz tavo ujwg'
+        sender_email = 'gabanivatsal17@gmail.com'
+        recipient_email = f'{email}'
+
+        subject = 'Copy of Feedback'
+        email_text = f"Hey,{name}\nYour Feedback has been successfully sent.\nHere's a copy of your response:\n{message}"
+
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = recipient_email
+        msg['Subject'] = subject
+
+        msg.attach(MIMEText(email_text, 'plain'))
+
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_username, smtp_password)
+        server.sendmail(sender_email, recipient_email, msg.as_string())
+        server.quit()
+
+        st.success("Your message has been sent!")
+
+# Close the database connection when you're done
+conn.close()

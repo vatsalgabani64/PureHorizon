@@ -23,6 +23,42 @@ textarea {
         /* Allow the user to vertically resize the textarea (not horizontally) */
 }
 
+.stTextInput,
+.stTextArea {
+    background-color: #0E1117;
+    /* Background color */
+    border: 0px solid #ccc;
+    /* Border style */
+    border-radius: 0px;
+    /* Add rounded corners */
+    padding: 0px;
+    /* Padding */
+    color: #333;
+}
+
+.stButton button {
+    background-color: #04AA6D;
+    /* Background color */
+    color: #fff;
+    /* Text color */
+    padding: 10px 20px;
+    /* Padding */
+    border: none;
+    /* Remove button border */
+    border-radius: 5px;
+    /* Add rounded corners */
+    cursor: pointer;
+    width: auto;
+    color: white;
+    /* align-items: c; */
+}
+
+.stButton button:hover {
+    background-color: rgb(71, 165, 42);
+    color: white;
+    /* Change background color on hover */
+}
+
 /* Style the submit button with a specific background color etc */
 button[type=submit] {
     background-color: #04AA6D;
@@ -37,6 +73,8 @@ button[type=submit] {
 button[type=submit]:hover {
     background-color: #45a049;
 }
+
+
 
 
 /* Hide Streamlit Branding */

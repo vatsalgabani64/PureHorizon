@@ -6,8 +6,14 @@ from streamlit_option_menu import option_menu
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.express as px
+import sqlite3
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+from dotenv import load_dotenv
+import os
 
-# Find more emojis here: https://www.webfx.com/tools/emoji-cheat-sheet/
 st.set_page_config(page_title="PureHorizon", page_icon=":tada:", layout="wide")
 
 def load_lottieurl(url):
@@ -61,34 +67,6 @@ with st.container():
     st.write("---")
     st.header("Air Quality Analysis and Vizulization")
     st.write("##")
-#     image_column, text_column = st.columns((1, 2))
-#     with image_column:
-#         st.image(img_lottie_animation)
-#     with text_column:
-#         st.subheader("Integrate Lottie Animations Inside Your Streamlit App")
-#         st.write(
-#             """
-#             Learn how to use Lottie Files in Streamlit!
-#             Animations make our web app more engaging and fun, and Lottie Files are the easiest way to do it!
-#             In this tutorial, I'll show you exactly how to do it
-#             """
-#         )
-        
-
-# with st.container():
-#     image_column, text_column = st.columns((1, 2))
-#     # with image_column:
-#     #     st.image(img_contact_form)
-#     with text_column:
-#         st.subheader("How To Add A Contact Form To Your Streamlit App")
-#         st.write(
-#             """
-#             Want to add a contact form to your Streamlit website?
-#             In this video, I'm going to show you how to implement a contact form in your Streamlit app using the free service ‘Form Submit’.
-#             """
-#         )
-#         # st.markdown("[Watch Video...](https://youtu.be/FOULV9Xij_8)")
-        
         
 st.markdown(
     """
@@ -146,7 +124,7 @@ def Analysis_screen():
         unsafe_allow_html=True
     )
     st.title('Predicted Pollutant Levels')
-    pollutants = st.multiselect('Select pollutants', ['PM2.5','PM10','SO2','CO','Ozone','NO2','AQI'])
+    pollutants = st.multiselect('Select pollutants', ['AQI','PM2.5','PM10','SO2','CO','Ozone','NO2'])
     if pollutants:
         df.set_index(df['Future_Date'],inplace=True)
         # st.write(df[pollutants])
@@ -156,12 +134,6 @@ def Analysis_screen():
 def Visualization_screen():
     
     df=pd.read_csv('predicted.csv')
-    # cities = {'City':['Ahmedabad','Gandhinagar']}
-    # cities = df2['City'].unique()
-    # selected_city = st.selectbox('Select city', cities)
-
-    # Filter the data to only include rows for the selected city
-    # df2 = df2[df2['City'] == selected_city]
 
     # Sample list of options
     options = ['PM2.5','PM10','SO2','CO','Ozone','NO2','AQI']
@@ -172,54 +144,17 @@ def Visualization_screen():
     st.title('Scale')
     data={'Corresponding AQI':standards['AQI'],f'{selected_option}':standards[selected_option]}
     stand_df = pd.DataFrame(data)
-    # st.table(stand_df)  
-    # st.dataframe(df.set_index(df.columns[0]))   #works but no heading for a index column
     st.markdown(stand_df.style.hide(axis="index").to_html(), unsafe_allow_html=True)
 
     st.title('Plot')
-    # st.title('Visualization')
     plt.figure(figsize=(4,3))
     plt.plot(df[f'prediction_{selected_option}'])
     plt.xticks(rotation=80)
     st.pyplot(plt,use_container_width=False)
 
-    
-
-
-
-
-
-    # df2=pd.read_csv('air_quality_data.csv')
-    # # cities = {'City':['Ahmedabad','Gandhinagar']}
-    # cities = df2['City'].unique()
-    # selected_city = st.selectbox('Select city', cities)
-
-    # # Filter the data to only include rows for the selected city
-    # df2 = df2[df2['City'] == selected_city]
-
-    # # Create a multiselect widget to allow the user to select the pollutants to display
-    # pollutants = st.multiselect('Select pollutants', ['PM2.5','PM10','NO','NO2','NOx','NH3','CO','SO2','O3','Benzene','Toluene','Xylene'])
-
-    # Create a scatter plot to display the selected pollutants over time for each city
-    # if pollutants:
-    #     chart_data = df2.melt(id_vars=['Date', 'City'], value_vars=pollutants, var_name='pollutant', value_name='level')
-    #     fig = px.scatter(chart_data, x='Date', y='level', color='pollutant')
-    
-    #     # Update the title of each subplot
-    #     fig.update_layout({'xaxis1': {'title': {'text': f'Air Quality of {selected_city}'}}})
-    
-    #     st.plotly_chart(fig, width=800, height=600)
-    
-    # else:
-    #     st.write('Please select at least one pollutant.')
-
-
 selected = option_menu(
         menu_title='Main Menu',
         options=["Home","Analysis","Visualization"],
-        # icons=["","",""],
-        # menu_icon='',
-        # default_index=0,
         orientation="horizontal",
         styles={"container":{"padding":"10px","margin":"0px"}}
     )
@@ -252,11 +187,13 @@ if selected == "Visualization":
 #     with right_column:
 #         st.empty()
 
-import sqlite3
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
+
+
+def configure():
+    load_dotenv()
+
+configure()
+
 
 # Database Connection
 conn = sqlite3.connect('form_data.db')
@@ -289,7 +226,7 @@ with st.form("Contact Form"):
         smtp_server = 'smtp.gmail.com'
         smtp_port = 587
         smtp_username = 'gabanivatsal17@gmail.com'
-        smtp_password = 'rpob ahoz tavo ujwg'
+        smtp_password = os.getenv('smtp_pass')
         sender_email = 'gabanivatsal17@gmail.com'
         recipient_email = f'{email}'
 

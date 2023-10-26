@@ -1,3 +1,4 @@
+import re
 import requests
 import streamlit as st
 from streamlit_lottie import st_lottie
@@ -68,38 +69,38 @@ with st.container():
     st.header("Air Quality Analysis and Vizulization")
     st.write("##")
         
-st.markdown(
-    """
-    <style>
-    # *{
-    #     background-color: #FF99FF;
-    #     color: black;
-    # }
-    .st-eb {
-        width: 50%;
-    }
-    table{
-        border-collapse:collapse;
-        width: 70%;
-    }
-    th, td {
-        width: 50%;
-    }
-    div[data-widget="stOptionMenu"] .stOptionMenu {
-        color:white;
-        padding: 10px;
-        margin: 0;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+# st.markdown(
+#     """
+#     <style>
+#     # *{
+#     #     background-color: #FF99FF;
+#     #     color: black;
+#     # }
+#     .st-eb {
+#         width: 50%;
+#     }
+#     table{
+#         border-collapse:collapse;
+#         width: 70%;
+#     }
+#     th, td {
+#         width: 50%;
+#     }
+#     div[data-widget="stOptionMenu"] .stOptionMenu {
+#         color:white;
+#         padding: 10px;
+#         margin: 0;
+#     }
+#     </style>
+#     """,
+#     unsafe_allow_html=True
+# )
 
-df = pd.read_csv('predicted.csv')
+# df = pd.read_csv('predicted.csv')
 standards = pd.read_csv('standard.csv')
 
 def Home_screen():
-    st.header("Air Quality Prediction")
+    st.subheader("Air Quality Prediction")
     st.write(
         """
         The following properties have been worked upon:
@@ -113,18 +114,37 @@ def Home_screen():
         """
     )
 
+
 def Analysis_screen():
-    st.markdown("""
+    st.title('Predicted Pollutant Levels')
+
+    # Sample list of options
+    city_options = ['Gandhinagar','Ahmedabad']
+
+    st.markdown(
+        """
         <style>
-            .multiselect label span {
-                color: red; /* Change the text color to red */
-            }
+        div[data-baseweb="select"]{
+            font-size:25px;
+        }
         </style>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
-    st.title('Predicted Pollutant Levels')
-    pollutants = st.multiselect('Select pollutants', ['AQI','PM2.5','PM10','SO2','CO','Ozone','NO2'])
+
+    st.subheader("Select City")
+    selected_city = st.selectbox(label='',options=city_options)
+    df=pd.read_csv(f'predicted_{selected_city}.csv')
+    if selected_city:
+        highest_score_index = df['Future_Date'][df['prediction_AQI'].idxmax()]
+        split_string = re.split(r'[:\s-]', highest_score_index)
+        st.write(f"Highest AQI obeserved : {split_string[3]}:{split_string[4]} on {split_string[2]}/{split_string[1]}")
+        highest_score_index = df['Future_Date'][df['prediction_AQI'].idxmin()]
+        split_string = re.split(r'[:\s-]', highest_score_index)
+        st.write(f"Lowest AQI obeserved : {split_string[3]}:{split_string[4]} on {split_string[2]}/{split_string[1]}")
+
+    st.subheader("Select Pollutant")
+    pollutants = st.multiselect('', ['AQI','PM2.5','PM10','SO2','CO','Ozone','NO2'])
     if pollutants:
         df.set_index(df['Future_Date'],inplace=True)
         # st.write(df[pollutants])
@@ -132,23 +152,27 @@ def Analysis_screen():
         st.write(df[lst])
 
 def Visualization_screen():
-    
-    df=pd.read_csv('predicted.csv')
-
     # Sample list of options
-    options = ['PM2.5','PM10','SO2','CO','Ozone','NO2','AQI']
+    city_options = ['Gandhinagar','Ahmedabad']
 
     # Use st.selectbox
-    selected_option = st.selectbox('Select pollutant :',  options)
+    selected_city = st.selectbox('Select City :',  city_options)
+    df=pd.read_csv(f'predicted_{selected_city}.csv')
+
+    # Sample list of options
+    pollutant_options = ['PM2.5','PM10','SO2','CO','Ozone','NO2','AQI']
+
+    # Use st.selectbox
+    selected_pollutant = st.selectbox('Select pollutant :',  pollutant_options)
 
     st.title('Scale')
-    data={'Corresponding AQI':standards['AQI'],f'{selected_option}':standards[selected_option]}
+    data={'Corresponding AQI':standards['AQI'],f'{selected_pollutant}':standards[selected_pollutant]}
     stand_df = pd.DataFrame(data)
     st.markdown(stand_df.style.hide(axis="index").to_html(), unsafe_allow_html=True)
 
     st.title('Plot')
     plt.figure(figsize=(4,3))
-    plt.plot(df[f'prediction_{selected_option}'])
+    plt.plot(df[f'prediction_{selected_pollutant}'])
     plt.xticks(rotation=80)
     st.pyplot(plt,use_container_width=False)
 
@@ -211,15 +235,24 @@ cursor.execute('''
 
 # Streamlit app
 st.title("Contact Form")
+st.write("Contact PureHorizon for any queries or feedback.")
 with st.form("Contact Form"):
+    city_options = ['Gandhinagar','Ahmedabad']
+
     # Get data from the form
     name = st.text_input("Your name")
     email = st.text_input("Your email")
-    message = st.text_area("Your message")
+    selected_city = st.selectbox('Select City :',  city_options)
+    
+    
+    df=pd.read_csv(f'predicted_{selected_city}.csv')
+    highest_AQI_index = df['Future_Date'][df['prediction_AQI'].idxmax()]
+    lowest_time = re.split(r'[:\s-]', highest_AQI_index)
+    # st.write(split_string)
 
     if st.form_submit_button("Send"):
         # Insert data into the database
-        cursor.execute("INSERT INTO contact_data (name, email, message) VALUES (?, ?, ?)", (name, email, message))
+        cursor.execute("INSERT INTO contact_data (name, email) VALUES (?, ?)", (name, email))
         conn.commit()
 
         # Send an email
@@ -230,8 +263,8 @@ with st.form("Contact Form"):
         sender_email = 'gabanivatsal17@gmail.com'
         recipient_email = f'{email}'
 
-        subject = 'Copy of Feedback'
-        email_text = f"Hey,{name}\nYour Feedback has been successfully sent.\nHere's a copy of your response:\n{message}"
+        subject = 'Hello from PureHorizon'
+        email_text = f"Hey,{name}\nYou just subscribed to the best weather forecasting services in the city.\n\nHere's some tips for the day:\n\nAir Quality is at its lowest at around {lowest_time[3]}:{lowest_time[4]} on {lowest_time[2]}th"
 
         msg = MIMEMultipart()
         msg['From'] = sender_email

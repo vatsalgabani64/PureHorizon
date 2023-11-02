@@ -134,7 +134,7 @@ def News_screen():
     st.markdown(custom_css, unsafe_allow_html=True)
 
 
-    url = "https://news.google.com/search?for=gandhinagar+weather+today&hl=en-IN&gl=IN&ceid=IN%3Aen"  # Replace with the URL of the weather news page
+    url = "https://news.google.com/search?q=ahmedabad%20weather&hl=en-IN&gl=IN&ceid=IN%3Aen"  # Replace with the URL of the weather news page
     # st.header("Today's Gandhinagar Weather News")
     response = requests.get(url)
     if response.status_code == 200:
@@ -316,11 +316,11 @@ with st.form("Contact Form"):
     email = st.text_input("Your email")
     # selected_city = st.selectbox('Select City :',  city_options)
     
-    # df=pd.read_csv(f'predicted_{selected_city}.csv')
+    df=pd.read_csv(f'FLASK_APPS/predicted_Gandhinagar.csv')
     # st.write(df['prediction_AQI'].idxmax())
-    # highest_AQI_index = df['Future_Date'][df['prediction_AQI'].idxmax()]
-    # lowest_time = re.split(r'[:\s-]', highest_AQI_index)
-    # st.write(split_string)
+    highest_AQI_index = df['Future_Date'][df['prediction_AQI'].idxmax()]
+    lowest_time = re.split(r'[:\s-]', highest_AQI_index)
+    # st.write(lowest_time[0].lstrip('0'))
 
     if st.form_submit_button("Send"):
         # Insert data into the database
@@ -336,8 +336,7 @@ with st.form("Contact Form"):
         recipient_email = f'{email}'
 
         subject = 'Hello from PureHorizon'
-        email_text = f"Hey,{name}\nYou just subscribed to the best weather forecasting services in the city."
-        # \n\nHere's some tips for the day:\n\nAir Quality is at its lowest at around {lowest_time[3]}:{lowest_time[4]} on {lowest_time[2]}th"
+        email_text = f"Hey,{name}\nYou just subscribed to the best weather forecasting services in the city.\n\nHere's some tips for the day:\n\nAir Quality is at its lowest at around {lowest_time[3]}:{lowest_time[4]} on {lowest_time[0].lstrip('0')}/{lowest_time[1].lstrip('0')}"
 
         msg = MIMEMultipart()
         msg['From'] = sender_email

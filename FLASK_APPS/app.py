@@ -69,7 +69,7 @@ def hello_world():
     #     aqi_Ozone= 82.41329506116035,
     #     aqi_NO2= 82.41329506116035)
     # db.session.add(airQuality)
-    return "Hello World!"
+    return "Welcome to Flask Backend"
 
 @app.route('/air_quality_data', methods=['GET'])
 def get_air_quality_data():

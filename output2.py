@@ -1,4 +1,5 @@
 import re
+import os
 import requests
 import streamlit as st
 from streamlit_lottie import st_lottie
@@ -13,7 +14,15 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from dotenv import load_dotenv
-import os
+
+# import requests
+# import streamlit as st
+# from streamlit_lottie import st_lottie
+# from PIL import Image
+# from streamlit_option_menu import option_menu
+# import pandas as pd
+# import matplotlib.pyplot as plt
+# import plotly.express as px
 
 st.set_page_config(page_title="PureHorizon", page_icon=":tada:", layout="wide")
 
@@ -59,8 +68,8 @@ st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 # st.markdown(f'<style>{open("style.css").read()}</style>', unsafe_allow_html=True)
 # ---- LOAD ASSETS ----
 lottie_coding = load_lottieurl("https://lottie.host/a96988fe-9d6f-448b-94c1-97b710cd53bf/Sg5SAAAUOw.json")
-img_contact_form = Image.open("image_01.jpg")
-img_lottie_animation = Image.open("image_01.jpg")
+# img_contact_form = Image.open("image_01.jpg")
+# img_lottie_animation = Image.open("image_01.jpg")
 
 # ---- HEADER SECTION ----
 st.title("PureHorizon")
@@ -111,7 +120,22 @@ def Home_screen():
         """
     )
 
+def get_air_quality_data():
+        response = requests.get('http://localhost:5000/air_quality_data')  # Replace with your Flask server URL
+        if response.status_code == 200:
+            return response.json()
+        else:
+            st.error(f"Error: Unable to retrieve data. Status code: {response.status_code}")
+            return []
+
+df = get_air_quality_data()
+
 def Analysis_screen():
+    data = get_air_quality_data()
+
+    # Convert the data to a DataFrame
+    df = pd.DataFrame(data)
+
     st.title('Predicted Pollutant Levels')
 
     # Sample list of options
@@ -128,20 +152,20 @@ def Analysis_screen():
         unsafe_allow_html=True,
     )
 
-    st.subheader("Select City")
-    selected_city = st.selectbox(label='',options=city_options)
-    df=pd.read_csv(f'predicted_{selected_city}.csv')
+    # st.subheader("Select City")
+    # selected_city = st.selectbox(label='',options=city_options)
+    # df=pd.read_csv(f'predicted_{selected_city}.csv')
 
     st.subheader("Select Pollutant")
-    pollutants = st.multiselect('', ['AQI','PM2.5','PM10','SO2','CO','Ozone','NO2'])
+    pollutants = st.multiselect('', ['AQI','PM2_5','PM10','SO2','CO','Ozone','NO2'])
 
-    if selected_city:
-        highest_score_index = df['Future_Date'][df['prediction_AQI'].idxmax()]
-        split_string = re.split(r'[:\s-]', highest_score_index)
-        st.write(f"Highest AQI obeserved : {split_string[3]}:{split_string[4]} on {split_string[2]}/{split_string[1]}")
-        highest_score_index = df['Future_Date'][df['prediction_AQI'].idxmin()]
-        split_string = re.split(r'[:\s-]', highest_score_index)
-        st.write(f"Lowest AQI obeserved : {split_string[3]}:{split_string[4]} on {split_string[2]}/{split_string[1]}")
+    # if selected_city:
+    #     highest_score_index = df['Future_Date'][df['prediction_AQI'].idxmax()]
+    #     split_string = re.split(r'[:\s-]', highest_score_index)
+    #     st.write(f"Highest AQI obeserved : {split_string[3]}:{split_string[4]} on {split_string[2]}/{split_string[1]}")
+    #     highest_score_index = df['Future_Date'][df['prediction_AQI'].idxmin()]
+    #     split_string = re.split(r'[:\s-]', highest_score_index)
+    #     st.write(f"Lowest AQI obeserved : {split_string[3]}:{split_string[4]} on {split_string[2]}/{split_string[1]}")
 
     
     if pollutants:
@@ -150,6 +174,11 @@ def Analysis_screen():
         lst = ['Future_Date'] + lst[0:]
         st.markdown(df[lst].style.hide(axis="index").to_html(), unsafe_allow_html=True)
         # st.write(df[lst])
+    else:
+        df.set_index(df['Future_Date'],inplace=True)
+        lst = ['prediction_AQI']
+        lst = ['Future_Date'] + lst[0:]
+        st.markdown(df[lst].style.hide(axis="index").to_html(), unsafe_allow_html=True)
 
 def Visualization_screen():
     # Sample list of options
@@ -160,7 +189,7 @@ def Visualization_screen():
     df=pd.read_csv(f'predicted_{selected_city}.csv')
 
     # Sample list of options
-    pollutant_options = ['PM2.5','PM10','SO2','CO','Ozone','NO2','AQI']
+    pollutant_options = ['AQI','PM2.5','PM10','SO2','CO','Ozone','NO2']
 
     # Use st.selectbox
     selected_pollutant = st.selectbox('Select pollutant :',  pollutant_options)
@@ -170,11 +199,40 @@ def Visualization_screen():
     stand_df = pd.DataFrame(data)
     st.markdown(stand_df.style.hide(axis="index").to_html(), unsafe_allow_html=True)
 
+    # highest_score_index = df['Future_Date'][df['prediction_AQI'].idxmax()]
+    # split_string = [re.split(r'[:\s-]', x) for x in df['Future_Date']]
+    # lst = [f'{x[3]}:{x[4]} {x[2]}' for x in split_string]
+    # # st.write(lst) 
+    # lst2 = pd.DataFrame(lst)
     st.title('Plot')
     plt.figure(figsize=(4,3))
-    plt.plot(df[f'prediction_{selected_pollutant}'])
-    plt.xticks(rotation=80)
+    plt.plot(df['Future_Date'],df[f'prediction_{selected_pollutant}'])
+    plt.xticks(rotation=80,fontsize=5)
+    rng=int(df[f'prediction_{selected_pollutant}'].max() - df[f'prediction_{selected_pollutant}'].min())
+    if rng<5:
+        step_size=1
+    elif rng<=20:
+        step_size=int(rng/2)
+    elif rng<=30:
+        step_size=int(rng/3)
+    else:
+        step_size=int(rng/5)
+    plt.yticks(range(int(df[f'prediction_{selected_pollutant}'].min()), int(df[f'prediction_{selected_pollutant}'].max()) + step_size, step_size))
+    plt.title(f'{selected_pollutant}')
+    plt.xlabel('Timestamp')
+    if selected_pollutant == "AQI":
+        plt.ylabel('units')
+    else:
+        plt.ylabel('ug/m3')
     st.pyplot(plt,use_container_width=False)
+    # if selected_city:
+    
+        # st.write(f"Highest AQI obeserved : {split_string[3]}:{split_string[4]} on {split_string[2]}/{split_string[1]}")
+        # highest_score_index = df['Future_Date'][df['prediction_AQI'].idxmin()]
+        # split_string = re.split(r'[:\s-]', highest_score_index)
+        # st.write(f"Lowest AQI obeserved : {split_string[3]}:{split_string[4]} on {split_string[2]}/{split_string[1]}")
+
+    
 
 selected = option_menu(
         menu_title='Main Menu',
@@ -220,10 +278,10 @@ with st.form("Contact Form"):
     email = st.text_input("Your email")
     selected_city = st.selectbox('Select City :',  city_options)
     
-    
-    df=pd.read_csv(f'predicted_{selected_city}.csv')
-    highest_AQI_index = df['Future_Date'][df['prediction_AQI'].idxmax()]
-    lowest_time = re.split(r'[:\s-]', highest_AQI_index)
+    # st.write(df['prediction_AQI'].idxmax())
+    # df=pd.read_csv(f'predicted_{selected_city}.csv')
+    # highest_AQI_index = df['Future_Date'][df['prediction_AQI'].idxmax()]
+    # lowest_time = re.split(r'[:\s-]', highest_AQI_index)
     # st.write(split_string)
 
     if st.form_submit_button("Send"):
@@ -240,7 +298,8 @@ with st.form("Contact Form"):
         recipient_email = f'{email}'
 
         subject = 'Hello from PureHorizon'
-        email_text = f"Hey,{name}\nYou just subscribed to the best weather forecasting services in the city.\n\nHere's some tips for the day:\n\nAir Quality is at its lowest at around {lowest_time[3]}:{lowest_time[4]} on {lowest_time[2]}th"
+        email_text = f"Hey,{name}\nYou just subscribed to the best weather forecasting services in the city."
+        # \n\nHere's some tips for the day:\n\nAir Quality is at its lowest at around {lowest_time[3]}:{lowest_time[4]} on {lowest_time[2]}th"
 
         msg = MIMEMultipart()
         msg['From'] = sender_email

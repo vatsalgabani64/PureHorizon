@@ -105,20 +105,55 @@ with st.container():
 
 
 
-def Home_screen():
-    st.subheader("Air Quality Prediction")
-    st.write(
-        """
-        The following properties have been worked upon:
-        - PM2.5
-        - PM10
-        - SO2
-        - CO
-        - Ozone 
-        - NO2
-        - AQI
-        """
-    )
+def News_screen():
+    # st.subheader("Air Quality Prediction")
+    # st.write(
+    #     """
+    #     The following properties have been worked upon:
+    #     - PM2.5
+    #     - PM10
+    #     - SO2
+    #     - CO
+    #     - Ozone 
+    #     - NO2
+    #     - AQI
+    #     """
+    # )
+    custom_css = """
+    <style>
+    a {
+        color: white !important; /* Set link color to white */
+        text-decoration: none !important; /* Remove underline */
+    }
+    </style>
+    """
+
+    # Apply the custom CSS
+    st.markdown(custom_css, unsafe_allow_html=True)
+
+
+    url = "https://news.google.com/search?for=gandhinagar+weather+today&hl=en-IN&gl=IN&ceid=IN%3Aen"  # Replace with the URL of the weather news page
+    # st.header("Today's Gandhinagar Weather News")
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        weather_news = soup.find_all("article")  # Modify class name accordingly
+        # print(weather_news)
+        # 4. Print or store the extracted data
+        for news in weather_news[:5]:
+            article = news.find("a")
+            link = "https://news.google.com/"+((article["href"])[2:])
+            headline = news.find("h3").text
+            # st.subheader(f"{headline}")
+              # Replace with the URL you want to open
+
+            # if st.header("Click to open the website"):
+            st.subheader(f"[{headline}]({link})")
+            print(f"Link: {link}")
+    else:
+        st.write("Failed to retrieve the webpage. Status code:", response.status_code)
+
 
 # def get_air_quality_data():
 #         response = requests.get('http://localhost:5000/air_quality_data')  # Replace with your Flask server URL
@@ -237,12 +272,12 @@ def Visualization_screen():
 
 selected = option_menu(
         menu_title='Main Menu',
-        options=["Home","Analysis","Visualization"],
+        options=["News","Analysis","Visualization"],
         orientation="horizontal",
         styles={"container":{"padding":"10px","margin":"0px"}}
     )
 if selected == "Home":
-    Home_screen()
+    News_screen()
 if selected == "Analysis":
     Analysis_screen()
 if selected == "Visualization":

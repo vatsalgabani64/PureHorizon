@@ -14,6 +14,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from dotenv import load_dotenv
+import requests
+from bs4 import BeautifulSoup
 
 # import requests
 # import streamlit as st
@@ -139,7 +141,7 @@ def News_screen():
         soup = BeautifulSoup(response.text, 'html.parser')
 
         weather_news = soup.find_all("article")  # Modify class name accordingly
-        # print(weather_news)
+        print(weather_news)
         # 4. Print or store the extracted data
         for news in weather_news[:5]:
             article = news.find("a")
@@ -276,7 +278,7 @@ selected = option_menu(
         orientation="horizontal",
         styles={"container":{"padding":"10px","margin":"0px"}}
     )
-if selected == "Home":
+if selected == "News":
     News_screen()
 if selected == "Analysis":
     Analysis_screen()

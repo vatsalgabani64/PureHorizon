@@ -103,7 +103,7 @@ with st.container():
     st.write("##")
         
 
-
+standards = pd.read_csv('standard.csv')
 
 def Home_screen():
     st.subheader("Air Quality Prediction")
@@ -120,21 +120,21 @@ def Home_screen():
         """
     )
 
-# def get_air_quality_data():
-#         response = requests.get('http://localhost:5000/air_quality_data')  # Replace with your Flask server URL
-#         if response.status_code == 200:
-#             return response.json()
-#         else:
-#             st.error(f"Error: Unable to retrieve data. Status code: {response.status_code}")
-#             return []
+def get_air_quality_data():
+        response = requests.get('http://localhost:5000/air_quality_data')  # Replace with your Flask server URL
+        if response.status_code == 200:
+            return response.json()
+        else:
+            st.error(f"Error: Unable to retrieve data. Status code: {response.status_code}")
+            return []
 
-# df = get_air_quality_data()
+df = get_air_quality_data()
 
 def Analysis_screen():
-    # data = get_air_quality_data()
+    data = get_air_quality_data()
 
     # Convert the data to a DataFrame
-    # df = pd.DataFrame(data)
+    df = pd.DataFrame(data)
 
     st.title('Predicted Pollutant Levels')
 
@@ -154,7 +154,7 @@ def Analysis_screen():
 
     # st.subheader("Select City")
     # selected_city = st.selectbox(label='',options=city_options)
-    df=pd.read_csv(f'FLASK_APPS/predicted_Gandhinagar.csv')
+    # df=pd.read_csv(f'predicted_{selected_city}.csv')
 
     st.subheader("Select Pollutant")
     pollutants = st.multiselect('', ['AQI','PM2_5','PM10','SO2','CO','Ozone','NO2'])
@@ -182,20 +182,19 @@ def Analysis_screen():
 
 def Visualization_screen():
     # Sample list of options
-    # city_options = ['Gandhinagar','Ahmedabad']
+    city_options = ['Gandhinagar','Ahmedabad']
 
     # Use st.selectbox
-    # selected_city = st.selectbox('Select City :',  city_options)
-    df=pd.read_csv(f'FLASK_APPS/predicted_Gandhinagar.csv')
+    selected_city = st.selectbox('Select City :',  city_options)
+    df=pd.read_csv(f'predicted_{selected_city}.csv')
 
     # Sample list of options
-    pollutant_options = ['AQI','PM2_5','PM10','SO2','CO','Ozone','NO2']
+    pollutant_options = ['AQI','PM2.5','PM10','SO2','CO','Ozone','NO2']
 
     # Use st.selectbox
     selected_pollutant = st.selectbox('Select pollutant :',  pollutant_options)
 
     st.title('Scale')
-    standards = pd.read_csv('standard.csv')
     data={'Corresponding AQI':standards['AQI'],f'{selected_pollutant}':standards[selected_pollutant]}
     stand_df = pd.DataFrame(data)
     st.markdown(stand_df.style.hide(axis="index").to_html(), unsafe_allow_html=True)
@@ -277,10 +276,10 @@ with st.form("Contact Form"):
     # Get data from the form
     name = st.text_input("Your name")
     email = st.text_input("Your email")
-    # selected_city = st.selectbox('Select City :',  city_options)
+    selected_city = st.selectbox('Select City :',  city_options)
     
-    # df=pd.read_csv(f'predicted_{selected_city}.csv')
     # st.write(df['prediction_AQI'].idxmax())
+    # df=pd.read_csv(f'predicted_{selected_city}.csv')
     # highest_AQI_index = df['Future_Date'][df['prediction_AQI'].idxmax()]
     # lowest_time = re.split(r'[:\s-]', highest_AQI_index)
     # st.write(split_string)

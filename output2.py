@@ -1,3 +1,4 @@
+#Import required libraries
 import re
 import os
 import requests
@@ -17,6 +18,7 @@ from dotenv import load_dotenv
 import requests
 from bs4 import BeautifulSoup
 
+#defining required functions and configurations
 st.set_page_config(page_title="PureHorizon", page_icon=":tada:", layout="wide")
 
 def load_lottieurl(url):
@@ -25,65 +27,47 @@ def load_lottieurl(url):
         return None
     return r.json()
 
-
-
-css = '''
-.stApp {
-    background: url('https://images.unsplash.com/photo-1487621167305-5d248087c724?auto=format&fit=crop&q=80&w=1932&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
-}
-.stApp > header {
-    background-color: transparent;
-}
-a.link-class {
-    color: red; /* Change the desired link color here */
-}
-.st-my-custom-class a{
-    color: blue;
-}
-'''
+#apply CSS
+with open("styles.css") as f:
+    css = f.read()
 st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
 lottie_coding = load_lottieurl("https://lottie.host/a96988fe-9d6f-448b-94c1-97b710cd53bf/Sg5SAAAUOw.json")
 
-# ---- HEADER SECTION ----
-st.title("PureHorizon")
-st.subheader("Air Pollution Prediction & Visualization")
-st.write("PureHorizon is a platform that uses machine learning to predict air quality and visualize pollution data. It can be used to track air quality in real time, identify pollution hotspots, and forecast air quality conditions. PureHorizon is a valuable tool for businesses, governments, and individuals who need to make informed decisions about air quality.")
-# st.markdown("<div class='st-my-custom-class'><a href='https://purehorizon.streamlit.app'>More information about PureHorizon</a></div>", unsafe_allow_html=True)
+#------------------PROJECT CODE STARTS HERE-----------------------------------
 
-# ---- WHAT WE DO ----
-with st.container():
-    st.write("---")
-    left_column, right_column = st.columns([3,2])
-    with left_column:
-        st.header("What We do")
-        # st.write("#")
-        st.subheader('Air Quality Prediction')
-        st.write('Air Quality Prediction throgh LSTM')
-        st.subheader('Data Analysis')
-        st.write('AQI analysis with Central Pollution Control Board(CPCB) specified methods')
-        st.subheader('Data Visualization')
-        st.write('Data Visualization for pollutants and AQI index')
-        st.subheader('Live News')
-        st.write('Get Live news updates regarding weather situations')
-        st.subheader('Email Updates')
-        st.write('Get regular weather mails to keep track of current weather situations')
+# ---- HEADER SECTION ----
+def header():
+    st.title("PureHorizon")
+    st.subheader("Air Pollution Prediction & Visualization")
+    st.write("PureHorizon is a platform that uses machine learning to predict air quality and visualize pollution data. It can be used to track air quality in real time, identify pollution hotspots, and forecast air quality conditions. PureHorizon is a valuable tool for businesses, governments, and individuals who need to make informed decisions about air quality.")
+
+# ---- PROJECT DESCRIPTION ----
+def description():
+    with st.container():
+        st.write("---")
+        left_column, right_column = st.columns([3,2])
+        with left_column:
+            st.header("What We do")
+            # st.write("#")
+            st.subheader('Air Quality Prediction')
+            st.write('Air Quality Prediction throgh LSTM')
+            st.subheader('Data Analysis')
+            st.write('AQI analysis with Central Pollution Control Board(CPCB) specified methods')
+            st.subheader('Data Visualization')
+            st.write('Data Visualization for pollutants and AQI index')
+            st.subheader('Live News')
+            st.write('Get Live news updates regarding weather situations')
+            st.subheader('Email Updates')
+            st.write('Get regular weather mails to keep track of current weather situations')
         
     
-    with right_column:
-        st.write("###")
-        st.write('<style>div[data-widget="stLottie"] { background-color: red; height:400px; width:400px;}</style>', unsafe_allow_html=True)
+        with right_column:
+            st.write("###")
+            st.write('<style>div[data-widget="stLottie"] { background-color: red; height:400px; width:400px;}</style>', unsafe_allow_html=True)
         
-        st_lottie(lottie_coding, height=300, key="coding")
+            st_lottie(lottie_coding, height=300, key="coding")
 
-# ---- PROJECTS ----
-with st.container():
-    st.write("---")
-    st.header("Air Quality Analysis and Visulization")
-    st.write("##")
-        
-
-
-
+# ---- MENU SCREENS ----
 def News_screen():
     custom_css = """
     <style>
@@ -120,29 +104,27 @@ def News_screen():
     else:
         st.write("Failed to retrieve the webpage. Status code:", response.status_code)
 
-
-
 def Analysis_screen():
 
-    st.title('Predicted Pollutant Levels')
-
-    # Sample list of options
-    city_options = ['Gandhinagar','Ahmedabad']
-
+    #custom CSS 
     st.markdown(
         """
         <style>
         div[data-baseweb="select"] {
-            font-size:25px;
+            font-size:15px;
         }
         </style>
         """,
         unsafe_allow_html=True,
     )
 
+    #Read dataset from CSV 
     df=pd.read_csv(f'FLASK_APPS/predicted_Gandhinagar.csv')
-
+    
+    st.title('Predicted Pollutant Levels')
     st.subheader("Select Pollutant")
+
+    # Prompt user to select pollutant to view dataset of
     pollutants = st.multiselect('', ['AQI','PM2_5','PM10','SO2','CO','Ozone','NO2'])
     
     if pollutants:
@@ -150,7 +132,6 @@ def Analysis_screen():
         lst = [f'prediction_{x}' for x in pollutants]
         lst = ['Future_Date'] + lst[0:]
         st.markdown(df[lst].style.hide(axis="index").to_html(), unsafe_allow_html=True)
-        # st.write(df[lst])
     else:
         df.set_index(df['Future_Date'],inplace=True)
         lst = ['prediction_AQI']
@@ -159,20 +140,21 @@ def Analysis_screen():
 
 def Visualization_screen():
 
+    #Read dataset from CSV 
     df=pd.read_csv(f'FLASK_APPS/predicted_Gandhinagar.csv')
 
-    # Sample list of options
+    # Prompt user to select pollutant
     pollutant_options = ['AQI','PM2_5','PM10','SO2','CO','Ozone','NO2']
-
-    # Use st.selectbox
     selected_pollutant = st.selectbox('Select pollutant :',  pollutant_options)
 
+    #Scale of values (mapped with AQI levels)
     st.title('Scale')
     standards = pd.read_csv('standard.csv')
     data={'Corresponding AQI':standards['AQI'],f'{selected_pollutant}':standards[selected_pollutant]}
     stand_df = pd.DataFrame(data)
     st.markdown(stand_df.style.hide(axis="index").to_html(), unsafe_allow_html=True)
 
+    #Plot of predicted values
     st.title('Plot')
     plt.figure(figsize=(4,3))
     plt.plot(df['Future_Date'],df[f'prediction_{selected_pollutant}'])
@@ -195,86 +177,105 @@ def Visualization_screen():
         plt.ylabel('ug/m3')
     st.pyplot(plt,use_container_width=False)
 
-    
+# ---- MENUBAR -----
+def Menu_header():
+    with st.container():
+        st.write("---")
+        st.header("Air Quality Analysis and Visulization")
+        st.write("##")
 
-selected = option_menu(
-        menu_title='Main Menu',
+# ---- CONTACT FORM ----
+def contact_form():
+
+    #Load env which contains smtp details
+    load_dotenv()
+
+    # Database Connection
+    conn = sqlite3.connect('form_data.db')
+    cursor = conn.cursor()
+
+    # Create a table to store form data
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS contact_data (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            email TEXT,
+            message TEXT
+        )
+    ''')
+
+    # Streamlit Form
+    st.write('')
+    st.write("---")
+    st.title("Subscribe")
+    st.write("Join in to get daily weather updates")
+    with st.form("Contact Form"):
+
+        # Get data from the form
+        name = st.text_input("Your name")
+        email = st.text_input("Your email")
+    
+        df=pd.read_csv(f'FLASK_APPS/predicted_Gandhinagar.csv')
+        highest_AQI_index = df['Future_Date'][df['prediction_AQI'].idxmax()]
+        lowest_time = re.split(r'[:\s-]', highest_AQI_index)
+
+        if st.form_submit_button("Submit"):
+            if not email or not name:
+                st.error("Empty fields detected")
+            else:
+                # Insert data into the database
+                cursor.execute("INSERT INTO contact_data (name, email) VALUES (?, ?)", (name, email))
+                conn.commit()
+
+                # Email configurations
+                smtp_server = 'smtp.gmail.com'
+                smtp_port = 587
+                smtp_username = 'purehorizonapp@gmail.com'
+                smtp_password = os.getenv('smtp_pass')
+                sender_email = 'purehorizonapp@gmail.com'
+                recipient_email = f'{email}'
+
+                #Email Format
+                subject = 'Hello from PureHorizon'
+                email_text = f"Hey,{name}\nYou just subscribed to the best weather forecasting services in the city.\n\nHere's some tips for the day:\n\nAir Quality is at its lowest at around {lowest_time[3]}:{lowest_time[4]} on {lowest_time[0].lstrip('0')}/{lowest_time[1].lstrip('0')}"
+
+
+                msg = MIMEMultipart()
+                msg['From'] = sender_email
+                msg['To'] = recipient_email
+                msg['Subject'] = subject
+
+                msg.attach(MIMEText(email_text, 'plain'))
+
+                server = smtplib.SMTP(smtp_server, smtp_port)
+                server.starttls()
+                server.login(smtp_username, smtp_password)
+                server.sendmail(sender_email, recipient_email, msg.as_string())
+                server.quit()
+
+                st.success("Welcome to PureHorizon!")
+
+            
+    # Close the database connection 
+    conn.close()
+
+if __name__=='__main__':
+
+    header()
+    description()
+    Menu_header()
+
+    selected = option_menu(
+        menu_title='',
         options=["News","Analysis","Visualization"],
         orientation="horizontal",
         styles={"container":{"padding":"10px","margin":"0px"}}
     )
-if selected == "News":
-    News_screen()
-if selected == "Analysis":
-    Analysis_screen()
-if selected == "Visualization":
-    Visualization_screen()
 
-def configure():
-    load_dotenv()
-
-configure()
-
-
-# Database Connection
-conn = sqlite3.connect('form_data.db')
-cursor = conn.cursor()
-
-# Create a table to store form data
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS contact_data (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        email TEXT,
-        message TEXT
-    )
-''')
-
-# Streamlit app
-st.write('')
-st.write("---")
-st.title("Subscribe")
-st.write("Join in to get daily weather updates")
-with st.form("Contact Form"):
-
-    # Get data from the form
-    name = st.text_input("Your name")
-    email = st.text_input("Your email")
-    
-    df=pd.read_csv(f'FLASK_APPS/predicted_Gandhinagar.csv')
-    highest_AQI_index = df['Future_Date'][df['prediction_AQI'].idxmax()]
-    lowest_time = re.split(r'[:\s-]', highest_AQI_index)
-
-    if st.form_submit_button("Send"):
-        # Insert data into the database
-        cursor.execute("INSERT INTO contact_data (name, email) VALUES (?, ?)", (name, email))
-        conn.commit()
-
-        # Send an email
-        smtp_server = 'smtp.gmail.com'
-        smtp_port = 587
-        smtp_username = 'gabanivatsal17@gmail.com'
-        smtp_password = os.getenv('smtp_pass')
-        sender_email = 'gabanivatsal17@gmail.com'
-        recipient_email = f'{email}'
-
-        subject = 'Hello from PureHorizon'
-        email_text = f"Hey,{name}\nYou just subscribed to the best weather forecasting services in the city.\n\nHere's some tips for the day:\n\nAir Quality is at its lowest at around {lowest_time[3]}:{lowest_time[4]} on {lowest_time[0].lstrip('0')}/{lowest_time[1].lstrip('0')}"
-
-        msg = MIMEMultipart()
-        msg['From'] = sender_email
-        msg['To'] = recipient_email
-        msg['Subject'] = subject
-
-        msg.attach(MIMEText(email_text, 'plain'))
-
-        server = smtplib.SMTP(smtp_server, smtp_port)
-        server.starttls()
-        server.login(smtp_username, smtp_password)
-        server.sendmail(sender_email, recipient_email, msg.as_string())
-        server.quit()
-
-        st.success("Your message has been sent!")
-
-# Close the database connection when you're done
-conn.close()
+    if selected == "News":
+        News_screen()
+    elif selected == "Analysis":
+        Analysis_screen()
+    elif selected == "Visualization":
+        Visualization_screen()
+    contact_form()

@@ -17,15 +17,6 @@ from dotenv import load_dotenv
 import requests
 from bs4 import BeautifulSoup
 
-# import requests
-# import streamlit as st
-# from streamlit_lottie import st_lottie
-# from PIL import Image
-# from streamlit_option_menu import option_menu
-# import pandas as pd
-# import matplotlib.pyplot as plt
-# import plotly.express as px
-
 st.set_page_config(page_title="PureHorizon", page_icon=":tada:", layout="wide")
 
 def load_lottieurl(url):
@@ -35,24 +26,9 @@ def load_lottieurl(url):
     return r.json()
 
 
-# Use local CSS
-# def local_css(file_name):
-#     with open(file_name) as f:
-#         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-# local_css("style.css")
-# st.markdown(
-#     f'<style>{open("style.css").read()}</style>',
-#     unsafe_allow_html=True,
-# )
 
 css = '''
 .stApp {
-    # background: black   ;
-    # background-size: cover;
-    # background-position: center;
-    # background-color: #333;
-    # color: white;
     background: url('https://images.unsplash.com/photo-1487621167305-5d248087c724?auto=format&fit=crop&q=80&w=1932&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
 }
 .stApp > header {
@@ -63,38 +39,39 @@ a.link-class {
 }
 .st-my-custom-class a{
     color: blue;
-
 }
 '''
 st.markdown(f'<style>{css}</style>', unsafe_allow_html=True)
-# st.markdown(f'<style>{open("style.css").read()}</style>', unsafe_allow_html=True)
-# ---- LOAD ASSETS ----
 lottie_coding = load_lottieurl("https://lottie.host/a96988fe-9d6f-448b-94c1-97b710cd53bf/Sg5SAAAUOw.json")
-# img_contact_form = Image.open("image_01.jpg")
-# img_lottie_animation = Image.open("image_01.jpg")
 
 # ---- HEADER SECTION ----
 st.title("PureHorizon")
 st.subheader("Air Pollution Prediction & Visualization")
 st.write("PureHorizon is a platform that uses machine learning to predict air quality and visualize pollution data. It can be used to track air quality in real time, identify pollution hotspots, and forecast air quality conditions. PureHorizon is a valuable tool for businesses, governments, and individuals who need to make informed decisions about air quality.")
-# st.write("[More informatio  n about PureHorizon]()") # added link for more info of our project
-st.markdown("<div class='st-my-custom-class'><a href='https://purehorizon.streamlit.app'>More information about PureHorizon</a></div>", unsafe_allow_html=True)
+# st.markdown("<div class='st-my-custom-class'><a href='https://purehorizon.streamlit.app'>More information about PureHorizon</a></div>", unsafe_allow_html=True)
+
 # ---- WHAT WE DO ----
 with st.container():
     st.write("---")
-    left_column, right_column = st.columns([2,1])
+    left_column, right_column = st.columns([3,2])
     with left_column:
         st.header("What We do")
-        st.write("##")
-        st.write(
-            """
-            - Data Analysis through Central Pollution Control Board(CPCB) specified methods for AQI calculation
-            - Air Quality Prediction throgh LSTM 
-            - Data Visualization for pollutants and AQI index
-            """
-        )
+        # st.write("#")
+        st.subheader('Air Quality Prediction')
+        st.write('Air Quality Prediction throgh LSTM')
+        st.subheader('Data Analysis')
+        st.write('AQI analysis with Central Pollution Control Board(CPCB) specified methods')
+        st.subheader('Data Visualization')
+        st.write('Data Visualization for pollutants and AQI index')
+        st.subheader('Live News')
+        st.write('Get Live news updates regarding weather situations')
+        st.subheader('Email Updates')
+        st.write('Get regular weather mails to keep track of current weather situations')
+        
+    
     with right_column:
-        st.write('<style>div[data-widget="stLottie"] { background-color: lightblue; }</style>', unsafe_allow_html=True)
+        st.write("###")
+        st.write('<style>div[data-widget="stLottie"] { background-color: red; height:400px; width:400px;}</style>', unsafe_allow_html=True)
         
         st_lottie(lottie_coding, height=300, key="coding")
 
@@ -108,19 +85,6 @@ with st.container():
 
 
 def News_screen():
-    # st.subheader("Air Quality Prediction")
-    # st.write(
-    #     """
-    #     The following properties have been worked upon:
-    #     - PM2.5
-    #     - PM10
-    #     - SO2
-    #     - CO
-    #     - Ozone 
-    #     - NO2
-    #     - AQI
-    #     """
-    # )
     custom_css = """
     <style>
     a {
@@ -141,7 +105,7 @@ def News_screen():
         soup = BeautifulSoup(response.text, 'html.parser')
 
         weather_news = soup.find_all("article")  # Modify class name accordingly
-        print(weather_news)
+        # print(weather_news)
         # 4. Print or store the extracted data
         for news in weather_news[:5]:
             article = news.find("a")
@@ -152,26 +116,13 @@ def News_screen():
 
             # if st.header("Click to open the website"):
             st.subheader(f"[{headline}]({link})")
-            print(f"Link: {link}")
+            # print(f"Link: {link}")
     else:
         st.write("Failed to retrieve the webpage. Status code:", response.status_code)
 
 
-# def get_air_quality_data():
-#         response = requests.get('http://localhost:5000/air_quality_data')  # Replace with your Flask server URL
-#         if response.status_code == 200:
-#             return response.json()
-#         else:
-#             st.error(f"Error: Unable to retrieve data. Status code: {response.status_code}")
-#             return []
-
-# df = get_air_quality_data()
 
 def Analysis_screen():
-    # data = get_air_quality_data()
-
-    # Convert the data to a DataFrame
-    # df = pd.DataFrame(data)
 
     st.title('Predicted Pollutant Levels')
 
@@ -189,21 +140,10 @@ def Analysis_screen():
         unsafe_allow_html=True,
     )
 
-    # st.subheader("Select City")
-    # selected_city = st.selectbox(label='',options=city_options)
     df=pd.read_csv(f'FLASK_APPS/predicted_Gandhinagar.csv')
 
     st.subheader("Select Pollutant")
     pollutants = st.multiselect('', ['AQI','PM2_5','PM10','SO2','CO','Ozone','NO2'])
-
-    # if selected_city:
-    #     highest_score_index = df['Future_Date'][df['prediction_AQI'].idxmax()]
-    #     split_string = re.split(r'[:\s-]', highest_score_index)
-    #     st.write(f"Highest AQI obeserved : {split_string[3]}:{split_string[4]} on {split_string[2]}/{split_string[1]}")
-    #     highest_score_index = df['Future_Date'][df['prediction_AQI'].idxmin()]
-    #     split_string = re.split(r'[:\s-]', highest_score_index)
-    #     st.write(f"Lowest AQI obeserved : {split_string[3]}:{split_string[4]} on {split_string[2]}/{split_string[1]}")
-
     
     if pollutants:
         df.set_index(df['Future_Date'],inplace=True)
@@ -218,11 +158,7 @@ def Analysis_screen():
         st.markdown(df[lst].style.hide(axis="index").to_html(), unsafe_allow_html=True)
 
 def Visualization_screen():
-    # Sample list of options
-    # city_options = ['Gandhinagar','Ahmedabad']
 
-    # Use st.selectbox
-    # selected_city = st.selectbox('Select City :',  city_options)
     df=pd.read_csv(f'FLASK_APPS/predicted_Gandhinagar.csv')
 
     # Sample list of options
@@ -237,11 +173,6 @@ def Visualization_screen():
     stand_df = pd.DataFrame(data)
     st.markdown(stand_df.style.hide(axis="index").to_html(), unsafe_allow_html=True)
 
-    # highest_score_index = df['Future_Date'][df['prediction_AQI'].idxmax()]
-    # split_string = [re.split(r'[:\s-]', x) for x in df['Future_Date']]
-    # lst = [f'{x[3]}:{x[4]} {x[2]}' for x in split_string]
-    # # st.write(lst) 
-    # lst2 = pd.DataFrame(lst)
     st.title('Plot')
     plt.figure(figsize=(4,3))
     plt.plot(df['Future_Date'],df[f'prediction_{selected_pollutant}'])
@@ -263,12 +194,6 @@ def Visualization_screen():
     else:
         plt.ylabel('ug/m3')
     st.pyplot(plt,use_container_width=False)
-    # if selected_city:
-    
-        # st.write(f"Highest AQI obeserved : {split_string[3]}:{split_string[4]} on {split_string[2]}/{split_string[1]}")
-        # highest_score_index = df['Future_Date'][df['prediction_AQI'].idxmin()]
-        # split_string = re.split(r'[:\s-]', highest_score_index)
-        # st.write(f"Lowest AQI obeserved : {split_string[3]}:{split_string[4]} on {split_string[2]}/{split_string[1]}")
 
     
 
@@ -306,21 +231,19 @@ cursor.execute('''
 ''')
 
 # Streamlit app
+st.write('')
+st.write("---")
 st.title("Subscribe")
 st.write("Join in to get daily weather updates")
 with st.form("Contact Form"):
-    city_options = ['Gandhinagar','Ahmedabad']
 
     # Get data from the form
     name = st.text_input("Your name")
     email = st.text_input("Your email")
-    # selected_city = st.selectbox('Select City :',  city_options)
     
     df=pd.read_csv(f'FLASK_APPS/predicted_Gandhinagar.csv')
-    # st.write(df['prediction_AQI'].idxmax())
     highest_AQI_index = df['Future_Date'][df['prediction_AQI'].idxmax()]
     lowest_time = re.split(r'[:\s-]', highest_AQI_index)
-    # st.write(lowest_time[0].lstrip('0'))
 
     if st.form_submit_button("Send"):
         # Insert data into the database
